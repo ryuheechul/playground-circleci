@@ -1,18 +1,39 @@
+
 version: 2.1
+
+parameters:
+  param-in-project:
+    type: string
+    default: $ENV_FROM_PROJECT
 
 # Define the jobs we want to run for this project
 jobs:
   build:
+    parameters:
+      param-in-job:
+        type: string
+        default: $ENV_FROM_PROJECT
     docker:
       - image: alpine
+        environment:
+          ENV_FROM_PROJ_PARAM: << pipeline.parameters.param-in-project >>
+          ENV_FROM_JOB_PARAM: << parameters.param-in-job >>
     steps:
-      - checkout
-      - run: echo "this is the build job"
+      - run: |
+          echo -n "ENV_FROM_PROJECT: "
+          printenv ENV_FROM_PROJECT
+          echo -n "ENV_FROM_PROJ_PARAM: "
+          printenv ENV_FROM_PROJ_PARAM
+          echo -n "ENV_FROM_JOB_PARAM: "
+          printenv ENV_FROM_JOB_PARAM
+          echo -n "pipeline.parameters.param-in-project: "
+          echo << pipeline.parameters.param-in-project >>
+          echo -n "parameters.param-in-job: "
+          echo << parameters.param-in-job >>
   test:
     docker:
       - image: alpine
     steps:
-      - checkout
       - run: echo "this is the test job"
 
 # Orchestrate our job run sequence
