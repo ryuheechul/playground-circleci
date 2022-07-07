@@ -1,4 +1,3 @@
-
 version: 2.1
 
 parameters:
@@ -16,16 +15,22 @@ jobs:
     docker:
       - image: alpine
         environment:
-          ENV_FROM_PROJ_PARAM: << pipeline.parameters.param-in-project >>
-          ENV_FROM_JOB_PARAM: << parameters.param-in-job >>
+          JOB_ENV_FROM_PROJ_PARAM: << pipeline.parameters.param-in-project >>
+          JOB_ENV_FROM_JOB_PARAM: << parameters.param-in-job >>
+          JOB_ENV_FROM_ENV_FROM_PROJECT: $ENV_FROM_PROJECT
+          JOB_ENV_DIRECT_VALUE: direct-value-mapping
     steps:
       - run: |
           echo -n "ENV_FROM_PROJECT: "
           printenv ENV_FROM_PROJECT
-          echo -n "ENV_FROM_PROJ_PARAM: "
-          printenv ENV_FROM_PROJ_PARAM
-          echo -n "ENV_FROM_JOB_PARAM: "
-          printenv ENV_FROM_JOB_PARAM
+          echo -n "JOB_ENV_FROM_ENV_FROM_PROJECT: "
+          printenv JOB_ENV_FROM_ENV_FROM_PROJECT
+          echo -n "JOB_ENV_FROM_PROJ_PARAM: "
+          printenv JOB_ENV_FROM_PROJ_PARAM
+          echo -n "JOB_ENV_FROM_JOB_PARAM: "
+          printenv JOB_ENV_FROM_JOB_PARAM
+          echo -n "JOB_ENV_DIRECT_VALUE: "
+          printenv JOB_ENV_DIRECT_VALUE
           echo -n "pipeline.parameters.param-in-project: "
           echo << pipeline.parameters.param-in-project >>
           echo -n "parameters.param-in-job: "
