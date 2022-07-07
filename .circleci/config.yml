@@ -10,7 +10,7 @@ parameters:
 
 # Define the jobs we want to run for this project
 jobs:
-  show:
+  naive-alpine:
     parameters:
       param-in-job:
         type: string
@@ -43,14 +43,43 @@ jobs:
           echo << pipeline.parameters.param-in-project-direct-value >>
           echo -n "JOB_ENV_FROM_PROJ_PARAM_DIRECT_VAL: "
           printenv JOB_ENV_FROM_PROJ_PARAM_DIRECT_VAL
-  test:
+  naive-ubuntu:
+    parameters:
+      param-in-job:
+        type: string
+        default: $ENV_FROM_PROJECT
     docker:
-      - image: alpine
+      - image: ubuntu
+        environment:
+          JOB_ENV_FROM_PROJ_PARAM: << pipeline.parameters.param-in-project >>
+          JOB_ENV_FROM_PROJ_PARAM_DIRECT_VAL: << pipeline.parameters.param-in-project-direct-value >>
+          JOB_ENV_FROM_JOB_PARAM: << parameters.param-in-job >>
+          JOB_ENV_FROM_ENV_FROM_PROJECT: $ENV_FROM_PROJECT
+          JOB_ENV_DIRECT_VALUE: direct-value-mapping
     steps:
-      - run: echo "this is the test job"
+      - run: |
+          echo -n "ENV_FROM_PROJECT: "
+          printenv ENV_FROM_PROJECT
+          echo -n "JOB_ENV_FROM_ENV_FROM_PROJECT: "
+          printenv JOB_ENV_FROM_ENV_FROM_PROJECT
+          echo -n "JOB_ENV_FROM_PROJ_PARAM: "
+          printenv JOB_ENV_FROM_PROJ_PARAM
+          echo -n "JOB_ENV_FROM_JOB_PARAM: "
+          printenv JOB_ENV_FROM_JOB_PARAM
+          echo -n "JOB_ENV_DIRECT_VALUE: "
+          printenv JOB_ENV_DIRECT_VALUE
+          echo -n "pipeline.parameters.param-in-project: "
+          echo << pipeline.parameters.param-in-project >>
+          echo -n "parameters.param-in-job: "
+          echo << parameters.param-in-job >>
+          echo -n "pipeline.parameters.param-in-project-direct-value: "
+          echo << pipeline.parameters.param-in-project-direct-value >>
+          echo -n "JOB_ENV_FROM_PROJ_PARAM_DIRECT_VAL: "
+          printenv JOB_ENV_FROM_PROJ_PARAM_DIRECT_VAL
 
 # Orchestrate our job run sequence
 workflows:
   print:
     jobs:
-      - show
+      - naive-alpine
+      - naive-ubuntu
