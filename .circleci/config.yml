@@ -129,3 +129,10 @@ workflows:
       - naive-alpine
       - naive-ubuntu
       - workaround-alpine
+
+# conclusion from this experiment:
+# - the workaround is the current best way that I can think of
+# - `envinronment:` is limited to interpret _$ENVVAR_ if not buggy
+# - `parameters` have nothing really to do with this issue
+# - unlike _$ENVVAR_, `parameters` can reach in all layers (at least the ones used in this config file)
+# - nothing to do with shell/guest-os level, it appears to be circleci thing
