@@ -90,7 +90,7 @@ jobs:
     docker:
       - image: alpine
         environment:
-          ## commenting out the ones that doesn't work here
+          ## commenting out the ones that don't work here
           # JOB_ENV_FROM_PROJ_PARAM: << pipeline.parameters.param-in-project >>
           # JOB_ENV_FROM_PROJ_PARAM_DIRECT_VAL: << pipeline.parameters.param-in-project-direct-value >>
           # JOB_ENV_FROM_JOB_PARAM: << parameters.param-in-job >>
