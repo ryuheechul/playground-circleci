@@ -18,13 +18,16 @@ jobs:
     docker:
       - image: alpine
         environment:
-          JOB_ENV_FROM_PROJ_PARAM: << pipeline.parameters.param-in-project >>
           JOB_ENV_FROM_PROJ_PARAM_DIRECT_VAL: << pipeline.parameters.param-in-project-direct-value >>
-          JOB_ENV_FROM_JOB_PARAM: << parameters.param-in-job >>
-          JOB_ENV_FROM_ENV_FROM_PROJECT: $ENV_FROM_PROJECT
           JOB_ENV_DIRECT_VALUE: direct-value-mapping
+          # these three would fail to follow the reference
+          JOB_ENV_FROM_PROJ_PARAM: << pipeline.parameters.param-in-project >>
+          JOB_ENV_FROM_JOB_PARAM: << parameters.param-in-job >>
+          # with this line, you can see the failing is not because of using parameters, but just because of accessing ENV VAR in `environment:` is problematic
+          JOB_ENV_FROM_ENV_FROM_PROJECT: $ENV_FROM_PROJECT
     steps:
       - run: |
+          # this works - meaning CircleCI brings project ENV VAR to container by default
           echo -n "ENV_FROM_PROJECT: "
           printenv ENV_FROM_PROJECT
           echo -n "JOB_ENV_FROM_ENV_FROM_PROJECT: "
@@ -43,6 +46,8 @@ jobs:
           echo << pipeline.parameters.param-in-project-direct-value >>
           echo -n "JOB_ENV_FROM_PROJ_PARAM_DIRECT_VAL: "
           printenv JOB_ENV_FROM_PROJ_PARAM_DIRECT_VAL
+
+  # this gives you perspective of dash from alpine and bash from ubuntu doesn't make any difference
   naive-ubuntu:
     parameters:
       param-in-job:
@@ -76,6 +81,7 @@ jobs:
           echo << pipeline.parameters.param-in-project-direct-value >>
           echo -n "JOB_ENV_FROM_PROJ_PARAM_DIRECT_VAL: "
           printenv JOB_ENV_FROM_PROJ_PARAM_DIRECT_VAL
+
   workaround-alpine:
     parameters:
       param-in-job:
@@ -84,6 +90,7 @@ jobs:
     docker:
       - image: alpine
         environment:
+          ## commenting out the ones that doesn't work here
           # JOB_ENV_FROM_PROJ_PARAM: << pipeline.parameters.param-in-project >>
           # JOB_ENV_FROM_PROJ_PARAM_DIRECT_VAL: << pipeline.parameters.param-in-project-direct-value >>
           # JOB_ENV_FROM_JOB_PARAM: << parameters.param-in-job >>
@@ -91,6 +98,7 @@ jobs:
           JOB_ENV_DIRECT_VALUE: direct-value-mapping
     steps:
       - run: |
+          # assign it this way would work
           export JOB_ENV_FROM_PROJ_PARAM=<< pipeline.parameters.param-in-project >>
           export JOB_ENV_FROM_PROJ_PARAM_DIRECT_VAL=<< pipeline.parameters.param-in-project-direct-value >>
           export JOB_ENV_FROM_JOB_PARAM=<< parameters.param-in-job >>
